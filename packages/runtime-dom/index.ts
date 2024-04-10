@@ -1,4 +1,21 @@
-import { createRenderer } from "../runtime-core/renderer";
+import {
+  CreateAppFunction,
+  createAppAPI,
+  createRenderer
+} from "../runtime-core";
 import { nodeOps } from "./nodeOps";
 
-const { renderer } = createRenderer(nodeOps)
+const { render } = createRenderer(nodeOps)
+const _createApp = createAppAPI(render)
+
+export const createApp = ((...args) => {
+  const app = _createApp(...args)
+  const { mount } = app
+  app.mount = (selecter: string) => {
+    const container = document.querySelector(selecter)
+    if (!container) return
+    mount(container)
+  }
+
+  return app
+}) as CreateAppFunction<Element>
